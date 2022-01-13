@@ -9,45 +9,41 @@ const port = process.env.PORT || 4000
 
 app.use(cors())
 
-// Parse URL-encoded bodies (as sent by HTML forms)
 app.use(express.urlencoded());
 
-// Parse JSON bodies (as sent by API clients)
 app.use(express.json());
 
 app.use(express.static('public'));
 
 app.use(function (req, res, next) {
 
-    // Website you wish to allow to connect
     res.setHeader('Access-Control-Allow-Origin', '*');
 
-    // Request methods you wish to allow
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
 
-    // Request headers you wish to allow
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
 
-    // Set to true if you need the website to include cookies in the requests sent
-    // to the API (e.g. in case you use sessions)
     res.setHeader('Access-Control-Allow-Credentials', true);
 
-    // Pass to next layer of middleware
     next();
 });
 
+//getAllThreads
 app.get('/', (req, res) => {
     Thread.find().then(thread => res.send(thread)).catch(err => console.log(err));
 })
 
+//getTopicsByIdThread
 app.get('/thread/:id', (req, res) => {
     Topic.find({id_thread: req.params.id}).then(Topic => res.send(Topic)).catch(err => console.log(err));
   })
 
+//getThreadById
 app.get('/get_thread/:id', (req, res) => {
     Thread.findById(req.params.id).then(Thread => res.send(Thread)).catch(err => console.log(err));
 })
 
+//post new thread
 app.post('/create_new_thread', (req, res) => {
     Thread.create(
         { 
@@ -61,6 +57,7 @@ app.post('/create_new_thread', (req, res) => {
         .catch(err => console.log(err));
 })
 
+//post new topic
 app.post('/thread/:id_thread/create_new_topic', (req, res) => {
     Topic.create(
         { 
@@ -74,13 +71,17 @@ app.post('/thread/:id_thread/create_new_topic', (req, res) => {
         .catch(err => console.log(err));
 })
 
+//get topic by topic_id
 app.get('/get_topic/:id', (req, res) => {
     Topic.findById(req.params.id).then(Topic => res.send(Topic)).catch(err => console.log(err));
 })
+
+//get msgs by topic_id
 app.get('/topic/:id', (req, res) => {
     Message.find({id_topic: req.params.id}).then(Msg => res.send(Msg)).catch(err => console.log(err));
 })
 
+// post new msg whis forgein key id_topic and $inc count_msg in topic and thread
 app.post('/thread/:id_thread/topic/:id_topic/create_new_message', (req, res) => {
     Topic.updateOne(
         {_id: req.params.id_topic}, 
@@ -104,12 +105,6 @@ app.post('/thread/:id_thread/topic/:id_topic/create_new_message', (req, res) => 
         .catch(err => console.log(err));
 })
 
-// app.post('thread/:id_thread/topic/:id_topic/create_new_message', (req, res) => {
-
-
-
-    
-// })
 
 async function start()
 {
